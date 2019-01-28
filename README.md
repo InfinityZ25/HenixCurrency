@@ -1,5 +1,5 @@
 # HenixCurrency
-Currency with a built-in API to allow developers to use a currency system across all their network
+Currency with a built-in API to allow developers to use a currency system across all their network. This Currency System caches all the data and only writes to the database when needed.
 
 # Config file
 The config file does not contain a lot but there is some to be explained. The "StorageType" string can be set to either of the following three:
