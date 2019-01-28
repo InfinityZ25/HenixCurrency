@@ -2,10 +2,22 @@
 Currency with a built-in API to allow developers to use a currency system across all their network. This Currency System caches all the data and only writes to the database when needed.
 
 # Config file
-The config file does not contain a lot but there is some to be explained. The "StorageType" string can be set to either of the following three:
-- MongoDB: My favourite database, authentication must be used in this plugin. Set the "Database" string as the authentication database. 
-- MySQL: Commonly used database. No further configuration is needed.
-- File or YML: Storages the player data as a .yml file. Easy to read and modify and no latency or caching is needed.
+The config file contains certain parameters that must be explained for those that are not entirely sure about what they mean.
+The String Storage.Type can take any of the three storage types (MongoDB, MySQL, or YML).
+
+MongoDB:
+ - If you want to connect to mongo you'll have to provide an URI (more info here https://bit.ly/2dPu67Q).
+ - A database name is also required, even if you have already invoked it on the URI.
+ 
+ MySQL:
+ - All the field must be provided for the connection to be established.
+ - The properties string, by default, contains recommended settings, however, if you need to perform any changes on it just follow the      same syntax: "property=value;property2=value2".
+ 
+ YML:
+ - Flat File storage does not need much configuration besides the name of the yml file if you wish to have a different one.
+ 
+ **If a connection to a database fails, YML will be set as the StorageType for that instance.**
+ 
 
 # API Usage
 Using this plugin's API is not hard at all. The method to invoke the API is:
