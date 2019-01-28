@@ -16,7 +16,7 @@ public class vFile implements PlayerDataInterface {
 
     public vFile(Currency instance){
         this.instance = instance;
-        file = new ConfigFile(instance, "storage.yml");
+        file = new ConfigFile(instance, instance.getConfig().getString("Storage.YML.Name"));
         file.save();
         file.reload();
     }
@@ -63,6 +63,11 @@ public class vFile implements PlayerDataInterface {
         User user = new User(uuid, i);
         instance.getUserManager().getUserList().put(uuid, user);
 
+    }
+
+    @Override
+    public StorageType getStoragetype() {
+        return StorageType.FILE;
     }
 
     private boolean isInStorage(UUID uuid){

@@ -19,10 +19,10 @@ public class vMySQL implements PlayerDataInterface{
     private MySQL mysql;
     private Map<UUID, User> cached_user;
 
-    public vMySQL(Currency instance, String username, String databasename, String password, String hostAddress, Integer port){
+    public vMySQL(Currency instance, String username, String databasename, String password, String hostAddress, Integer port, String arguments) throws Exception{
         this.instance = instance;
         this.cached_user = new HashMap<>();
-        this.mysql = new MySQL(hostAddress, username, password, databasename, port);
+        this.mysql = new MySQL(instance, hostAddress, username, password, databasename, port, arguments);
         this.mysql.update("CREATE TABLE IF NOT EXISTS Currency (UUID VARCHAR(100), Name VARCHAR(20), Coins Integer);");}
 
 
@@ -76,6 +76,11 @@ public class vMySQL implements PlayerDataInterface{
             io.printStackTrace();
         }
 
+    }
+
+    @Override
+    public StorageType getStoragetype() {
+        return StorageType.MYSQL;
     }
 
     private boolean isInDatabase(UUID uuid) {

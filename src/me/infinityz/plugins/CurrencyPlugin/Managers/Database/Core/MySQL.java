@@ -1,5 +1,7 @@
 package me.infinityz.plugins.CurrencyPlugin.Managers.Database.Core;
 
+import me.infinityz.plugins.CurrencyPlugin.Currency;
+import me.infinityz.plugins.CurrencyPlugin.Managers.Database.Types.vFile;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 
@@ -13,37 +15,37 @@ public class MySQL {
     private String host;
     private int port;
     private Connection connection;
+    private Currency instance;
 
-    public MySQL(String host, String username, String password, String database, int port){
+    public MySQL(Currency instance, String host, String username, String password, String database, int port, String arguments) throws Exception {
+        this.instance = instance;
         this.host = host;
         this.username = username;
         this.password = password;
         this.database = database;
         this.port = port;
-        initConnection(true);
+        initConnection(arguments);
     }
 
-    private void initConnection(boolean bol){
+    private void initConnection(String props) throws Exception {
         try {
             final Properties properties = new Properties();
             properties.setProperty("user", this.username);
             properties.setProperty("password", this.password);
-            properties.setProperty("autoReconnect", "true");
-            properties.setProperty("verifyServerCertificate", "false");
-            properties.setProperty("useSSL", "false");
-            properties.setProperty("requireSSL", "false");
-            properties.setProperty("connectTimeout", "500");
+            for(String prop : props.split(";")){
+                String[] Property = prop.split("=");
+                properties.setProperty(Property[0], Property[1]);
+            }
             connection = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database, properties);
-            if(bol){
-                System.out.println("[Currency] Mysql has been successfully established!");
-            }
+            instance.getLogger().info("MySQL connection has been successfully established!");
+
+
         } catch (SQLException e) {
-            if(bol){
-                System.out.println("[Currency] Mysql connection could not be established due to " + e.getCause().getLocalizedMessage());
-                System.out.println("[Currency] jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database);
-            }
-            //Bukkit.getServer().getPluginManager().disablePlugin(HenixCore.getInstance());
-            //e.printStackTrace();
+            instance.getLogger().severe("MySQL connection could not be established due to " + e.getCause().getLocalizedMessage());
+            instance.getLogger().severe("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database);
+            instance.getLogger().warning("Proceeding with YML as the storage type!");
+            throw new Exception("MySQL cannot be reached!");
+
         }
     }
 

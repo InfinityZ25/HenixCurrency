@@ -15,4 +15,10 @@ public interface PlayerDataInterface {
 
     void cacheUser(UUID uuid);
 
+    StorageType getStoragetype();
+
+    enum StorageType{
+        MONGO, MYSQL, FILE
+    }
+
 }

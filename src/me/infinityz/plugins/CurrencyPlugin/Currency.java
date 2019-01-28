@@ -35,15 +35,18 @@ public class Currency extends JavaPlugin {
         return playerDatabase;
     }
 
+
     @Override
     public void onEnable(){
         configDefault();
         handleStorage();
         this.userManager = new UserManager();
         loadCommands();
-        loadListeners();
 
-        currencyAPI = new CurrencyAPI(this, getConfig().getString("Stats.StorageType").toLowerCase());
+
+        currencyAPI = new CurrencyAPI(this);
+
+        loadListeners();
 
     }
 
@@ -63,27 +66,37 @@ public class Currency extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new EventListener(this), this);
     }
 
+    public void setToYML(){
+    }
+
     private void handleStorage(){
-        switch(getConfig().getString("Stats.StorageType").toLowerCase()){
+        switch(getConfig().getString("Storage.Type").toLowerCase()){
             case "mongodb":
             case "mongo":{
-                this.playerDatabase = new MongoDB(this,
-                        getConfig().getString("Stats.Username"),
-                        getConfig().getString("Stats.Database"),
-                        getConfig().getString("Stats.Password"),
-                        getConfig().getString("Stats.Ip"),
-                        getConfig().getInt("Stats.Port"));
+                try {
+                    this.playerDatabase = new MongoDB(this,
+                            getConfig().getString("Storage.MongoDB.URI"),
+                            getConfig().getString("Storage.MongoDB.Database"));
+                } catch (Exception io) {
+                    this.playerDatabase = new vFile(this);
+                }
                 break;
             }
             case "mariadb":
             case "sql":
             case "mysql":{
-                this.playerDatabase = new vMySQL(this,
-                        getConfig().getString("Stats.Username"),
-                        getConfig().getString("Stats.Database"),
-                        getConfig().getString("Stats.Password"),
-                        getConfig().getString("Stats.Ip"),
-                        getConfig().getInt("Stats.Port"));
+                try {
+                    this.playerDatabase = new vMySQL(this,
+                            getConfig().getString("Storage.MySQL.Username"),
+                            getConfig().getString("Storage.MySQL.Database"),
+                            getConfig().getString("Storage.MySQL.Password"),
+                            getConfig().getString("Storage.MySQL.Ip"),
+                            getConfig().getInt("Storage.MySQL.Port"),
+                            getConfig().getString("Storage.MySQL.Properties"));
+                }catch (Exception io){
+                    this.playerDatabase = new vFile(this);
+                }
+
                 break;
             }
             default:{
@@ -97,12 +110,16 @@ public class Currency extends JavaPlugin {
     private void configDefault() {
         FileConfiguration config = getConfig();
 
-        config.addDefault("Stats.StorageType", "MongoDB");
-        config.addDefault("Stats.Ip", "mongohost.mlab.com");
-        config.addDefault("Stats.Port", 11275);
-        config.addDefault("Stats.Database", "Database");
-        config.addDefault("Stats.Username", "root");
-        config.addDefault("Stats.Password", "password");
+        config.addDefault("Storage.Type", "MongoDB");
+        config.addDefault("Storage.MongoDB.URI", "mongodb://username:password@my.mongohost.com:27017/authDatabase?connectTimeoutMS=5000");
+        config.addDefault("Storage.MongoDB.Database", "my-database-name");
+        config.addDefault("Storage.MySQL.Ip", "my.mysqlhost.com");
+        config.addDefault("Storage.MySQL.Port", 3306);
+        config.addDefault("Storage.MySQL.Database", "Database");
+        config.addDefault("Storage.MySQL.Username", "root");
+        config.addDefault("Storage.MySQL.Password", "password");
+        config.addDefault("Storage.MySQL.Properties", "autoReconnect=true;verifyServerCertificate=false;useSSL=false;requireSSL=false;connectTimeout=500");
+        config.addDefault("Storage.YML.Name", "data.yml");
 
         config.options().copyDefaults(true);
         saveConfig();

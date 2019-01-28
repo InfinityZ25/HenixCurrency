@@ -1,8 +1,5 @@
 package me.infinityz.plugins.CurrencyPlugin.Managers.Database.Types;
 
-import com.mongodb.MongoClientSettings;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -14,10 +11,11 @@ import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -29,19 +27,43 @@ public class MongoDB implements PlayerDataInterface {
     private MongoDatabase mongoDatabase;
     private MongoCollection<Document> mongoCollection;
 
-    public MongoDB(Currency instance, String username, String databasename, String password, String hostAddress, Integer port){
+    public MongoDB(Currency instance, String connectionURL, String databasename) throws Exception {
         this.instance = instance;
-        MongoCredential credential = MongoCredential.createCredential(username, databasename, password.toCharArray());
-        MongoClient mongoClient = MongoClients.create(
-                MongoClientSettings.builder()
-                        .applyToClusterSettings(builder ->
-                                builder.hosts(Collections.singletonList(new ServerAddress(hostAddress, port))))
-                        .credential(credential)
-                        .build());
+        Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
+        mongoLogger.setLevel(Level.WARNING); // e.g. or Log.WARNING, etc.
+        MongoClient mongoClient = MongoClients.create(connectionURL);
+        if(connectionURL.equalsIgnoreCase("mongodb://username:password@my.mongohost.com:27017/authDatabase?connectTimeoutMS=5000")){
+            instance.getLogger().severe("Connection with Mongo cannot be established, go to you config and edit the URI!");
+            instance.getLogger().warning("Proceeding with YML as the storage type!");
+            throw new Exception("MongoDB cannot be reached!");
+        }
+
+
         mongoDatabase = mongoClient.getDatabase(databasename);
         mongoCollection = mongoDatabase.getCollection("CurrencyPlugin");
-        cached_users= new HashMap<>();
+        cached_users = new HashMap<>();
 
+        instance.getLogger().info("Attempting to connect to the database...");
+
+        try{
+            pingMongo();
+            instance.getLogger().info("Connection has been successful!");
+        }catch (Exception io){
+            instance.getLogger().severe("Connection has failed due to: " + io.getLocalizedMessage());
+            instance.getLogger().warning("Proceeding with YML as the storage type!");
+            throw new Exception("MongoDB cannot be reached!");
+        }
+
+    }
+
+    private void pingMongo(){
+        Document ping = new Document("ping", "1");
+        mongoDatabase.runCommand(ping);
+    }
+
+    @Override
+    public StorageType getStoragetype() {
+        return StorageType.MONGO;
     }
 
     @Override
