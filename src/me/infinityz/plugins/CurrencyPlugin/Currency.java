@@ -98,11 +98,11 @@ public class Currency extends JavaPlugin {
         FileConfiguration config = getConfig();
 
         config.addDefault("Stats.StorageType", "MongoDB");
-        config.addDefault("Stats.Ip", "ds211275.mlab.com");
+        config.addDefault("Stats.Ip", "mongohost.mlab.com");
         config.addDefault("Stats.Port", 11275);
-        config.addDefault("Stats.Database", "perms");
-        config.addDefault("Stats.Username", "henix");
-        config.addDefault("Stats.Password", "Juanorlando1!");
+        config.addDefault("Stats.Database", "Database");
+        config.addDefault("Stats.Username", "root");
+        config.addDefault("Stats.Password", "password");
 
         config.options().copyDefaults(true);
         saveConfig();
