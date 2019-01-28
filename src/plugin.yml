@@ -1,0 +1,6 @@
+name: CurrencyPlugin
+version: 1.0
+author: InfinityZ
+main: me.infinityz.plugins.CurrencyPlugin.Currency
+commands:
+  coins:
