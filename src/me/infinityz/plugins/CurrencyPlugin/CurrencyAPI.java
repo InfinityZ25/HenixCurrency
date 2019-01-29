@@ -30,7 +30,7 @@ public class CurrencyAPI {
     }
 
     public void take(UUID uuid, int coins){
-        instance.getUserManager().getUserList().get(uuid).addCoins(coins);
+        instance.getUserManager().getUserList().get(uuid).addCoins(-coins);
         if(type == PlayerDataInterface.StorageType.FILE)return;
         instance.getPlayerDatabase().savePlayer(uuid);
 
